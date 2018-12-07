@@ -67,20 +67,44 @@ Matrix4x4 calculatecamTransform(Camera cam){
     Matrix4x4 second;
     first = first.matrixCreator(cam.u.x,cam.u.y,cam.u.z,0,cam.v.x,cam.v.y,cam.v.z,0,cam.w.x,cam.w.y,cam.w.z,0,0,0,0,1);
     second = second.matrixCreator(1,0,0,-cam.pos.x,0,1,0,-cam.pos.y,0,0,1,-cam.pos.z,0,0,0,1);
+    Matrix4x4 deneme = first*second;
+
     return first*second;
 }
 
 Matrix4x4 calculatePersTransform(Camera cam){
-    double first = (2*cam.n)/(cam.r-cam.l);
-    double second = (cam.r + cam.l)/(cam.r - cam.l);
-    
+    double r11 = (2*cam.n)/(cam.r-cam.l);
+    double r13 = (cam.r + cam.l)/(cam.r - cam.l);
+    double r22 = (2*cam.n)/(cam.t-cam.b);
+    double r23 = (cam.t + cam.b)/(cam.t - cam.b);
+    double r33 = -(cam.f+cam.n)/(cam.f-cam.n);
+    double r34 = -(cam.f*cam.n)/(cam.f-cam.n);
+    double r43 = -1;
+    Matrix4x4 perspective = perspective.matrixCreator(r11,0,r13,0,0,r22,r23,0,0,0,r33,r34,0,0,r43,0);
+    return perspective;
+
+}
+
+Matrix4x4 calculateViewPort(Camera cam){
+    double r11 = cam.sizeX/2.0;
+    double r14 = (cam.sizeX -1)/2.0;
+    double r22 = cam.sizeY/2.0;
+    double r24 = (cam.sizeY-1)/2.0;
+    double r33 = 1.0/2.0;
+    double r34 = 1.0/2.0;
+    Matrix4x4 viewPort = viewPort.matrixCreator4x3(r11,0,0,r14,0,r22,0,r24,0,0,r33,r34);
+    return viewPort;
+
 }
 
 
 void forwardRenderingPipeline(Camera cam) {
     Matrix4x4 camTransform = calculatecamTransform(cam);
     cout<<camTransform<<endl;
-    //Matrix4x4 persTransform = calculatePersTransform(cam);
+    Matrix4x4 persTransform = calculatePersTransform(cam);
+    cout<<persTransform<<endl;
+    Matrix4x4 viewportTransform = calculateViewPort(cam);
+    cout<<viewportTransform<<endl;
 }
 
 
