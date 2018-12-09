@@ -102,21 +102,131 @@ Color color_decider(Vec3 v1,Vec3 v2){
     return colors[v1.colorId];
 }
 
-void slope_decider(int& x0, int& y0, int& x1, int& y1){
-    if((x1 - x0) == 0) return;
-    double m = (y1-y0)/(x1-x0);
-    if(m < 0){
-        int temp = x1;
-        x1 = x0;
-        x0 = temp;
-        temp = y1;
-        y1 = y0;
-        y0 = temp;
+void slope_decider(int& x0, int& y0, int& x1, int& y1, int& type, int& slope){
+    double currs = double (y1-y0) / double (x1-x0);
+    if(currs > 1){
+        slope = 1;
     }
-
+    else{
+        slope = 0;
+    }
+    if(x1>x0 && y1>y0) {type = 0;}
+    else if(x0>x1 && y1>y0) type = 1;
+    else if(x1>x0 && y0>y1) type = 2;
+    else if(x0>x1 && y0>y1) type = 3;
+    else type =4;
 }
 
 void rasterize(Vec3 v1, Vec3 v2){
+    int type= 0;
+    int x0 = v1.x;
+    int y0 = v1.y;
+    Color color0 = colors[v1.colorId];
+    int x1 = v2.x;
+    int y1 = v2.y;
+    Color color1 = colors[v2.colorId];
+    int slope = 0;
+    int slope2 = 0;
+    slope_decider(x0,y0,x1,y1,type,slope2);
+    if(type == 0){
+
+    }
+    else if(type == 1){
+        x0 = v2.x;
+        y0 = v2.y;
+        color0 = colors[v2.colorId];
+        x1 = v1.x;
+        y1 = v1.y;
+        color1 = colors[v1.colorId];
+        slope = 1;
+    }
+    else if(type == 2){
+        slope = 1;
+    }
+    else if(type == 3){
+        x0 = v2.x;
+        y0 = v2.y;
+        color0 = colors[v2.colorId];
+        x1 = v1.x;
+        y1 = v1.y;
+        color1 = colors[v1.colorId];
+    }
+    else{
+        cout<<"ERROR"<<endl;
+    }
+    if (slope == 0){
+        if(slope2 == 0){
+            int y = y0;
+            int d = 2*(y0 - y1) + (x1-x0);
+            for(int x =x0; x<x1; x++){
+                //cout<<"X: "<<x<<" Y: "<<y<<endl;
+                cout<<"ILK X: "<<x<<", "<<y<<endl;
+                Color color = color_decider(v1,v2);
+                image[x][y].r = color.r;
+                image[x][y].g = color.g;
+                image[x][y].b = color.b;
+                if(d<0){
+                    y+=1;
+                    d+= 2*((y0 -y1) + (x1-x0)); 
+                    
+                }
+                else{
+                    d+= 2*(y0-y1);
+                }
+            }
+
+        }
+        else{
+            int x = x0;
+            int d = 2*(x0 - x1) + (y1-y0);
+            cout<<"GIRIS"<<endl;
+            cout<<"X0: "<<x0<<", Y0:"<<y0<<", X1:"<<x1<<", Y1:"<<y1<<endl;
+            cout<<"Type: "<<type<<endl;
+            for(int y =y0; y<y1; y++){
+                //cout<<"X: "<<x<<" Y: "<<y<<endl;
+                cout<<"ILK X: "<<x<<", "<<y<<endl;
+                Color color = color_decider(v1,v2);
+                image[x][y].r = color.r;
+                image[x][y].g = color.g;
+                image[x][y].b = color.b;
+                if(d<0){
+                    x+=1;
+                    d+= 2*((x0 -x1) + (y1-y0)); 
+                    
+                }
+                else{
+                    d+= 2*(x0-x1);
+                }
+            }
+            cout<<"CIKIS"<<endl;
+
+
+        }
+        
+    }
+    else{
+        
+        int y = y0;
+        int d = 2*(y1 - y0) + (x0-x1);
+        for(int x= x0; x>x1; x--){
+            cout<<"IKI X: "<<x<<", "<<y<<endl;
+            Color color = color_decider(v1,v2);
+            image[x][y].r = color.r;
+            image[x][y].g = color.g;
+            image[x][y].b = color.b;
+            if(d<0){
+                y+=1;
+                d+= 2*((y1 -y0) + (x0-x1)); 
+                
+            }
+            else{
+                d+= 2*(y1-y0);
+            }
+            
+
+        }
+
+    }
     /*int x0 = v1.x;
     int x1 = v2.x;
     int y0 = v1.y;
@@ -277,7 +387,6 @@ void forwardRenderingPipeline(Camera cam) {
             v1.x = verticeMatrix.matrix4x1[0]; v1.y = verticeMatrix.matrix4x1[1]; v1.z = verticeMatrix.matrix4x1[2];
             v2.x = verticeMatrix1.matrix4x1[0]; v2.y = verticeMatrix1.matrix4x1[1]; v2.z = verticeMatrix1.matrix4x1[2];
             v3.x = verticeMatrix2.matrix4x1[0]; v3.y = verticeMatrix2.matrix4x1[1]; v3.z = verticeMatrix2.matrix4x1[2];
-            if(j == 3){
                 cout<<"V1: "<<v1.x<<", "<<v1.y<<endl;
                 cout<<"V2: "<<v2.x<<", "<<v2.y<<endl;
                 rasterize(v1,v2);
@@ -287,7 +396,6 @@ void forwardRenderingPipeline(Camera cam) {
                 cout<<"V2: "<<v2.x<<", "<<v2.y<<endl;
                 cout<<"V3: "<<v3.x<<", "<<v3.y<<endl;
                 rasterize(v2,v3);
-            }
             
             
             
