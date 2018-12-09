@@ -103,7 +103,7 @@ Color color_decider(Vec3 v1,Vec3 v2){
 }
 
 void slope_decider(int& x0, int& y0, int& x1, int& y1, int& type, int& slope){
-    double currs = double (y1-y0) / double (x1-x0);
+    double currs = double( abs(y1-y0) )/ double( abs(x1-x0));
     if(currs > 1){
         slope = 1;
     }
@@ -139,6 +139,7 @@ void rasterize(Vec3 v1, Vec3 v2){
         y1 = v1.y;
         color1 = colors[v1.colorId];
         slope = 1;
+         cout<<"DOGRU BILDIN"<<endl;
     }
     else if(type == 2){
         slope = 1;
@@ -150,6 +151,7 @@ void rasterize(Vec3 v1, Vec3 v2){
         x1 = v1.x;
         y1 = v1.y;
         color1 = colors[v1.colorId];
+       
     }
     else{
         cout<<"ERROR"<<endl;
@@ -160,7 +162,7 @@ void rasterize(Vec3 v1, Vec3 v2){
             int d = 2*(y0 - y1) + (x1-x0);
             for(int x =x0; x<x1; x++){
                 //cout<<"X: "<<x<<" Y: "<<y<<endl;
-                cout<<"ILK X: "<<x<<", "<<y<<endl;
+                //cout<<"ILK X: "<<x<<", "<<y<<endl;
                 Color color = color_decider(v1,v2);
                 image[x][y].r = color.r;
                 image[x][y].g = color.g;
@@ -179,12 +181,12 @@ void rasterize(Vec3 v1, Vec3 v2){
         else{
             int x = x0;
             int d = 2*(x0 - x1) + (y1-y0);
-            cout<<"GIRIS"<<endl;
-            cout<<"X0: "<<x0<<", Y0:"<<y0<<", X1:"<<x1<<", Y1:"<<y1<<endl;
-            cout<<"Type: "<<type<<endl;
+           // cout<<"GIRIS"<<endl;
+           // cout<<"X0: "<<x0<<", Y0:"<<y0<<", X1:"<<x1<<", Y1:"<<y1<<endl;
+           // cout<<"Type: "<<type<<endl;
             for(int y =y0; y<y1; y++){
                 //cout<<"X: "<<x<<" Y: "<<y<<endl;
-                cout<<"ILK X: "<<x<<", "<<y<<endl;
+                //cout<<"ILK X: "<<x<<", "<<y<<endl;
                 Color color = color_decider(v1,v2);
                 image[x][y].r = color.r;
                 image[x][y].g = color.g;
@@ -198,7 +200,7 @@ void rasterize(Vec3 v1, Vec3 v2){
                     d+= 2*(x0-x1);
                 }
             }
-            cout<<"CIKIS"<<endl;
+            //cout<<"CIKIS"<<endl;
 
 
         }
@@ -207,7 +209,7 @@ void rasterize(Vec3 v1, Vec3 v2){
     else{
         if(slope2 == 0){
             int y = y0;
-            int d = 2*(abs(y0) - abs(y1)) + (x1-x0);
+            int d = 2*((y1) - (y0)) + (x1-x0);
             for(int x =x0; x<x1; x++){
                 //cout<<"X: "<<x<<" Y: "<<y<<endl;
                 cout<<"ILK X: "<<x<<", "<<y<<endl;
@@ -215,33 +217,33 @@ void rasterize(Vec3 v1, Vec3 v2){
                 image[x][y].r = color.r;
                 image[x][y].g = color.g;
                 image[x][y].b = color.b;
-                if(d>0){
+                if(d<0){
                     y-=1;
-                    d+= 2*((abs(y0) -abs(y1)) + (x1-x0)); 
+                    d+= 2*(((y1) -(y0)) + (x1-x0)); 
                     
                 }
                 else{
-                    d+= 2*(abs(y0)-abs(y1));
+                    d+= 2*((y1)-(y0));
                 }
             }
 
         }
         else{
             int x = x0;
-            int d = 2*(x0 - x1) + (abs(y1)-abs(y0));
+            int d = 2*(x0 - x1) + ((y0)-(y1));
             cout<<"GIRIS"<<endl;
             cout<<"X0: "<<x0<<", Y0:"<<y0<<", X1:"<<x1<<", Y1:"<<y1<<endl;
             cout<<"Type: "<<type<<endl;
-            for(int y =y1; y>y0; y--){
+            for(int y =y0; y>y1; y--){
                 //cout<<"X: "<<x<<" Y: "<<y<<endl;
-                cout<<"ILK X: "<<x<<", "<<y<<endl;
+                cout<<"IKI X: "<<x<<", "<<y<<endl;
                 Color color = color_decider(v1,v2);
                 image[x][y].r = color.r;
                 image[x][y].g = color.g;
                 image[x][y].b = color.b;
-                if(d>0){
+                if(d<0){
                     x+=1;
-                    d+= 2*((x0 -x1) + (abs(y1)-abs(y0))); 
+                    d+= 2*((x0 -x1) + ((y0)-(y1))); 
                     
                 }
                 else{
