@@ -47,6 +47,7 @@ struct Matrix4x4{
     double matrix4x1[4];
     int type;
     Matrix4x4 operator*(Matrix4x4 right);
+    Matrix4x4 operator-(Matrix4x4 right);
     Matrix4x4 matrixCreator(double,double,double,double,double,double,double,double,double,double,double,double,double,double,double,double);
     Matrix4x4 matrixCreator4x3(double,double,double,double,double,double,double,double,double,double,double,double);
     Matrix4x4 matrixCreator4x1(double,double,double,double);
@@ -118,6 +119,15 @@ double calculate_mult(double row, double column){
     return row * column;
 }
 
+
+Matrix4x4 Matrix4x4::operator-(Matrix4x4 right){
+    Matrix4x4 resultmatrix;
+    resultmatrix.matrix4x1[0] = right.matrix4x1[0] - (this->matrix4x1[0]);
+    resultmatrix.matrix4x1[1] = right.matrix4x1[1] - this->matrix4x1[1];
+    resultmatrix.matrix4x1[2] = right.matrix4x1[2] - this->matrix4x1[2];
+    return resultmatrix;
+
+}
 
 Matrix4x4 Matrix4x4::operator*(Matrix4x4 right){
     Matrix4x4 result_matrix;
@@ -233,6 +243,14 @@ Matrix4x4 Matrix4x4::rotationMatrixM(Rotation rotate){
 
 	Matrix4x4 matrixM;
     matrixM.type = 0;
+    Vec3 rotate2;
+    rotate2.x = rotate.ux;
+    rotate2.y = rotate.uy;
+    rotate2.z = rotate.uz;
+    normalizeVec3(rotate2);
+    rotate.ux = rotate2.x;
+    rotate.uy = rotate2.y;
+    rotate.uz = rotate2.z;
 
 	if((abs(rotate.uz) <= abs(rotate.ux)) && (abs(rotate.uz) <= abs(rotate.uy)))
 	{
@@ -308,7 +326,14 @@ Matrix4x4 Matrix4x4::rotationMatrixM(Rotation rotate){
 Matrix4x4 Matrix4x4::rotationMatrixminusM(Rotation rotate){
 	Matrix4x4 matrixMinusM;
     matrixMinusM.type =0;
-
+    Vec3 rotate2;
+    rotate2.x = rotate.ux;
+    rotate2.y = rotate.uy;
+    rotate2.z = rotate.uz;
+    normalizeVec3(rotate2);
+    rotate.ux = rotate2.x;
+    rotate.uy = rotate2.y;
+    rotate.uz = rotate2.z;
 	if((abs(rotate.uz) <= abs(rotate.ux)) && (abs(rotate.uz) <= abs(rotate.uy))){
 		matrixMinusM.matrix[0][0]= rotate.ux;
 		matrixMinusM.matrix[0][1]= -rotate.uy;
@@ -383,26 +408,27 @@ Matrix4x4 Matrix4x4::rotationMatrix(Rotation rotate){
 
 	Matrix4x4 matrixRx;
     matrixRx.type=0;
-
+    
 	matrixRx.matrix[0][0]= 1;
 	matrixRx.matrix[0][1]= 0;
 	matrixRx.matrix[0][2]= 0;
 	matrixRx.matrix[0][3]= 0;
 
 	matrixRx.matrix[1][0]= 0;
-	matrixRx.matrix[1][1]= cos(rotate.angle * M_PI / 180) ;
-	matrixRx.matrix[1][2]= -sin(rotate.angle * M_PI / 180);
+	matrixRx.matrix[1][1]= cos(rotate.angle * M_PI / 180.0) ;
+	matrixRx.matrix[1][2]= -sin(rotate.angle * M_PI / 180.0);
 	matrixRx.matrix[1][3]= 0;
 
 	matrixRx.matrix[2][0]= 0;
-	matrixRx.matrix[2][1]= sin(rotate.angle * M_PI / 180);
-	matrixRx.matrix[2][2]= cos(rotate.angle * M_PI / 180);
+	matrixRx.matrix[2][1]= sin(rotate.angle * M_PI / 180.0);
+	matrixRx.matrix[2][2]= cos(rotate.angle * M_PI / 180.0);
 	matrixRx.matrix[2][3]= 0;
 
 	matrixRx.matrix[3][0]= 0;
 	matrixRx.matrix[3][1]= 0;
 	matrixRx.matrix[3][2]= 0;
 	matrixRx.matrix[3][3]= 1;
+
 
 	return matrixRx;
 }
@@ -510,10 +536,10 @@ void slope_decider(int& x0, int& y0, int& x1, int& y1, int& type, int& slope){
     else{
         slope = 0;
     }
-    if(x1>x0 && y1>y0) {type = 0;}
-    else if(x0>x1 && y1>y0) type = 1;
-    else if(x1>x0 && y0>y1) type = 2;
-    else if(x0>x1 && y0>y1) type = 3;
+    if(x1>=x0 && y1>=y0) {type = 0;}
+    else if(x0>=x1 && y1>=y0) type = 1;
+    else if(x1>=x0 && y0>=y1) type = 2;
+    else if(x0>=x1 && y0>=y1) type = 3;
     else type =4;
 }
 
@@ -539,7 +565,7 @@ void rasterize(Vec3 v1, Vec3 v2){
         y1 = v1.y;
         color1 = colors[v1.colorId];
         slope = 1;
-         cout<<"DOGRU BILDIN"<<endl;
+         //cout<<"DOGRU BILDIN"<<endl;
     }
     else if(type == 2){
         slope = 1;
@@ -554,7 +580,7 @@ void rasterize(Vec3 v1, Vec3 v2){
        
     }
     else{
-        cout<<"ERROR"<<endl;
+        cout<<"ERROR at X: "<<x0<<", Y: "<<y0<<", X1: "<<x1<<", Y1: "<<y1<<endl;
     }
     if (slope == 0){
         if(slope2 == 0){
@@ -632,7 +658,7 @@ void rasterize(Vec3 v1, Vec3 v2){
             int d = 2*((y1) - (y0)) + (x1-x0);
             for(int x =x0; x<x1; x++){
                 //cout<<"X: "<<x<<" Y: "<<y<<endl;
-                cout<<"ILK X: "<<x<<", "<<y<<endl;
+                //cout<<"ILK X: "<<x<<", "<<y<<endl;
                 Color color;
                  if(x1==x0){
                 color.r = (color0.r*(y1-y)+color1.r*(y-y0))/(y1-y0);
@@ -661,12 +687,12 @@ void rasterize(Vec3 v1, Vec3 v2){
         else{
             int x = x0;
             int d = 2*(x0 - x1) + ((y0)-(y1));
-            cout<<"GIRIS"<<endl;
-            cout<<"X0: "<<x0<<", Y0:"<<y0<<", X1:"<<x1<<", Y1:"<<y1<<endl;
-            cout<<"Type: "<<type<<endl;
+            //cout<<"GIRIS"<<endl;
+            //cout<<"X0: "<<x0<<", Y0:"<<y0<<", X1:"<<x1<<", Y1:"<<y1<<endl;
+            //cout<<"Type: "<<type<<endl;
             for(int y =y0; y>y1; y--){
                 //cout<<"X: "<<x<<" Y: "<<y<<endl;
-                cout<<"IKI X: "<<x<<", "<<y<<endl;
+                //cout<<"IKI X: "<<x<<", "<<y<<endl;
                 Color color;
              
                 
@@ -691,7 +717,7 @@ void rasterize(Vec3 v1, Vec3 v2){
                     d+= 2*(x0-x1);
                 }
             }
-            cout<<"CIKIS"<<endl;
+            //cout<<"CIKIS"<<endl;
 
 
         }
@@ -756,10 +782,11 @@ void forwardRenderingPipeline(Camera cam) {
             Matrix4x4 verticeMatrix = verticeMatrix.matrixCreator4x1(v1.x,v1.y,v1.z,1.0);
             Matrix4x4 verticeMatrix1 = verticeMatrix1.matrixCreator4x1(v2.x,v2.y,v2.z,1.0);
             Matrix4x4 verticeMatrix2 = verticeMatrix2.matrixCreator4x1(v3.x,v3.y,v3.z,1.0);
-            Matrix4x4 totalTransform;
+            Matrix4x4 totalTransform = totalTransform.matrixCreator(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
             totalTransform.type = 0;
             Matrix4x4 transform;
             transform.type = 0;
+            
             for(int k=0; k<numberoftransform; k++){
                 char currenttransform = models[i].transformationTypes[k];
                 int currenttransformid = models[i].transformationIDs[k];
@@ -805,20 +832,51 @@ void forwardRenderingPipeline(Camera cam) {
 
                 
             }
+            
             //cout<<totalTransform<<endl;
             totalTransform = camTransform * totalTransform;
+            
             //cout<<totalTransform<<endl;
             totalTransform = persTransform * totalTransform;
+            
             //cout<<totalTransform<<endl;
             verticeMatrix = totalTransform * verticeMatrix;
             verticeMatrix1 = totalTransform * verticeMatrix1;
             verticeMatrix2 = totalTransform * verticeMatrix2;
+
+
+            v1.x = verticeMatrix.matrix4x1[0]; v1.y = verticeMatrix.matrix4x1[1]; v1.z = verticeMatrix.matrix4x1[2];
+            v2.x = verticeMatrix1.matrix4x1[0]; v2.y = verticeMatrix1.matrix4x1[1]; v2.z = verticeMatrix1.matrix4x1[2];
+            v3.x = verticeMatrix2.matrix4x1[0]; v3.y = verticeMatrix2.matrix4x1[1]; v3.z = verticeMatrix2.matrix4x1[2];
+            if(backfaceCullingSetting == 1){
+                Vec3 v0v1, v0v2, normal,camtotriangle;
+                double cullingdecide1,cullingdecide2,cullingdecide3;
+                v0v1 = subtractVec3(v2,v1);
+                v0v2 = subtractVec3(v3,v1);
+                normal = crossProductVec3(v0v2,v0v1);
+                camtotriangle = subtractVec3(v1,cam.pos);
+                cullingdecide1 = dotProductVec3(normal,camtotriangle);
+                camtotriangle = subtractVec3(v1,cam.pos);
+                cullingdecide2 = dotProductVec3(normal,camtotriangle);
+                camtotriangle = subtractVec3(v1,cam.pos);
+                cullingdecide3 = dotProductVec3(normal,camtotriangle);
+
+                if(cullingdecide1 > 0 || cullingdecide2 > 0 || cullingdecide3 > 0){
+                    continue;
+                }
+
+            }
             verticeMatrix.matrix4x1[0] = verticeMatrix.matrix4x1[0]/verticeMatrix.matrix4x1[3];
             verticeMatrix.matrix4x1[1] = verticeMatrix.matrix4x1[1]/verticeMatrix.matrix4x1[3];
             verticeMatrix.matrix4x1[2] = verticeMatrix.matrix4x1[2]/verticeMatrix.matrix4x1[3];
             verticeMatrix.matrix4x1[3] = 1;
             
+            
+
+            
             verticeMatrix = viewportTransform * verticeMatrix;
+
+            
 
             //cout<<verticeMatrix<<endl;
             verticeMatrix1.matrix4x1[0] = verticeMatrix1.matrix4x1[0]/verticeMatrix1.matrix4x1[3];
@@ -833,6 +891,8 @@ void forwardRenderingPipeline(Camera cam) {
             verticeMatrix2.matrix4x1[3] = 1;
             verticeMatrix2 = viewportTransform * verticeMatrix2;
             //cout<<verticeMatrix2<<endl;
+            
+            
             Color colorof0 = colors[currentTriangle.vertexIds[0]];
             Color colorof1 = colors[currentTriangle.vertexIds[1]];
             Color colorof2 = colors[currentTriangle.vertexIds[2]];
@@ -850,14 +910,14 @@ void forwardRenderingPipeline(Camera cam) {
             v1.x = verticeMatrix.matrix4x1[0]; v1.y = verticeMatrix.matrix4x1[1]; v1.z = verticeMatrix.matrix4x1[2];
             v2.x = verticeMatrix1.matrix4x1[0]; v2.y = verticeMatrix1.matrix4x1[1]; v2.z = verticeMatrix1.matrix4x1[2];
             v3.x = verticeMatrix2.matrix4x1[0]; v3.y = verticeMatrix2.matrix4x1[1]; v3.z = verticeMatrix2.matrix4x1[2];
-            cout<<"V1: "<<v1.x<<", "<<v1.y<<endl;
-            cout<<"V2: "<<v2.x<<", "<<v2.y<<endl;
+            //cout<<"V1: "<<v1.x<<", "<<v1.y<<endl;
+            //cout<<"V2: "<<v2.x<<", "<<v2.y<<endl;
             rasterize(v1,v2);
-            cout<<"V1: "<<v1.x<<", "<<v1.y<<endl;
-            cout<<"V3: "<<v3.x<<", "<<v3.y<<endl;
+            //cout<<"V1: "<<v1.x<<", "<<v1.y<<endl;
+            //cout<<"V3: "<<v3.x<<", "<<v3.y<<endl;
             rasterize(v1,v3);
-            cout<<"V2: "<<v2.x<<", "<<v2.y<<endl;
-            cout<<"V3: "<<v3.x<<", "<<v3.y<<endl;
+            //cout<<"V2: "<<v2.x<<", "<<v2.y<<endl;
+            //cout<<"V3: "<<v3.x<<", "<<v3.y<<endl;
             rasterize(v2,v3);
             if(models[i].type == 1){
                 rasterizeTriangle(v1,v2,v3);
