@@ -205,24 +205,51 @@ void rasterize(Vec3 v1, Vec3 v2){
         
     }
     else{
-        
-        int y = y0;
-        int d = 2*(y1 - y0) + (x0-x1);
-        for(int x= x0; x>x1; x--){
-            cout<<"IKI X: "<<x<<", "<<y<<endl;
-            Color color = color_decider(v1,v2);
-            image[x][y].r = color.r;
-            image[x][y].g = color.g;
-            image[x][y].b = color.b;
-            if(d<0){
-                y+=1;
-                d+= 2*((y1 -y0) + (x0-x1)); 
-                
+        if(slope2 == 0){
+            int y = y0;
+            int d = 2*(abs(y0) - abs(y1)) + (x1-x0);
+            for(int x =x0; x<x1; x++){
+                //cout<<"X: "<<x<<" Y: "<<y<<endl;
+                cout<<"ILK X: "<<x<<", "<<y<<endl;
+                Color color = color_decider(v1,v2);
+                image[x][y].r = color.r;
+                image[x][y].g = color.g;
+                image[x][y].b = color.b;
+                if(d>0){
+                    y-=1;
+                    d+= 2*((abs(y0) -abs(y1)) + (x1-x0)); 
+                    
+                }
+                else{
+                    d+= 2*(abs(y0)-abs(y1));
+                }
             }
-            else{
-                d+= 2*(y1-y0);
+
+        }
+        else{
+            int x = x0;
+            int d = 2*(x0 - x1) + (abs(y1)-abs(y0));
+            cout<<"GIRIS"<<endl;
+            cout<<"X0: "<<x0<<", Y0:"<<y0<<", X1:"<<x1<<", Y1:"<<y1<<endl;
+            cout<<"Type: "<<type<<endl;
+            for(int y =y1; y>y0; y--){
+                //cout<<"X: "<<x<<" Y: "<<y<<endl;
+                cout<<"ILK X: "<<x<<", "<<y<<endl;
+                Color color = color_decider(v1,v2);
+                image[x][y].r = color.r;
+                image[x][y].g = color.g;
+                image[x][y].b = color.b;
+                if(d>0){
+                    x+=1;
+                    d+= 2*((x0 -x1) + (abs(y1)-abs(y0))); 
+                    
+                }
+                else{
+                    d+= 2*(x0-x1);
+                }
             }
-            
+            cout<<"CIKIS"<<endl;
+
 
         }
 
